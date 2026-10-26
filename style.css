@@ -1,4 +1,8 @@
-
+/* ==========================================================================
+   THEME VARIABLES & BASE STYLES
+   Colors: Deep Black & Light Pink (#FFB6C1 / #FFD1DC)
+   Fonts: Vidaloka (Headings) & Space Mono (Body/UI)
+   ========================================================================== */
 
 :root {
     --bg-black: #0a0a0c;
@@ -193,15 +197,22 @@ body {
 /* Step Sections */
 .step-section {
     display: none;
-    opacity: 0;
-    transform: translateY(15px);
-    transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
 .step-section.active {
     display: block;
-    opacity: 1;
-    transform: translateY(0);
+    animation: fadeInStep 0.4s ease forwards;
+}
+
+@keyframes fadeInStep {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .main-card {
@@ -339,7 +350,6 @@ textarea:focus {
     color: var(--pink-primary);
     text-transform: uppercase;
     letter-spacing: 1px;
-
 }
 
 #recap-text {
@@ -421,14 +431,16 @@ textarea:focus {
 .card-image-wrapper {
     position: relative;
     width: 100%;
-    height: 380px;
-    background: #000;
+    min-height: 380px;
+    background: #0a0a0c;
 }
 
 .card-image-wrapper img {
     width: 100%;
     height: 100%;
+    min-height: 380px;
     object-fit: cover;
+    display: block;
 }
 
 .image-overlay {
@@ -566,6 +578,7 @@ textarea:focus {
     width: 100%;
     height: 200px;
     object-fit: cover;
+    display: block;
 }
 
 .gallery-card-body {
@@ -604,7 +617,7 @@ textarea:focus {
     gap: 4px;
 }
 
-/* Responsive adjustments */
+/* Responsive Adjustments */
 @media (max-width: 600px) {
     .main-card {
         padding: 24px 18px;
