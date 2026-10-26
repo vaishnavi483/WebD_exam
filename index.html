@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LifeFlip - Student What-If Studio</title>
+    <!-- Google Fonts: Vidaloka & Space Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Vidaloka&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Animated Elements -->
+    <div class="glow-orb orb-1"></div>
+    <div class="glow-orb orb-2"></div>
+    <div class="glow-orb orb-3"></div>
+
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header glass-panel">
+            <div class="brand">
+                <span class="logo-icon">✨</span>
+                <span class="logo-text">LifeFlip</span>
+            </div>
+            <p class="tagline">Turn daily student struggles into surreal, hopeful parallel realities.</p>
+        </header>
+
+        <!-- Step Indicator Bar -->
+        <div class="stepper-bar glass-panel">
+            <div class="step-item active" id="step-nav-1">
+                <span class="step-num">01</span>
+                <span class="step-label">Rant</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item" id="step-nav-2">
+                <span class="step-num">02</span>
+                <span class="step-label">What-If</span>
+            </div>
+            <div class="step-divider"></div>
+            <div class="step-item" id="step-nav-3">
+                <span class="step-num">03</span>
+                <span class="step-label">Visualize</span>
+            </div>
+        </div>
+
+        <!-- Main Workspace View -->
+        <main class="workspace">
+
+            <!-- STEP 1: Problem Input -->
+            <section id="step-1" class="step-section active">
+                <div class="glass-panel main-card">
+                    <h2 class="section-title">What's weighing on you today?</h2>
+                    <p class="section-subtitle">Spill the tea on your campus stress, exams, dorm chaos, or bad luck.</p>
+                    
+                    <div class="preset-chips">
+                        <span class="chip-label">Quick presets:</span>
+                        <button class="chip" onclick="applyPreset('Failed my midterms after studying all night long.')">📝 Failed exam</button>
+                        <button class="chip" onclick="applyPreset('Snoozed my alarm 5 times and missed the 8 AM lecture.')">⏰ Missed 8 AM class</button>
+                        <button class="chip" onclick="applyPreset('Group project teammates went completely ghost on me.')">👻 Ghosting team</button>
+                        <button class="chip" onclick="applyPreset('Spilled hot coffee all over my clean assignment notes.')">☕ Coffee spill</button>
+                    </div>
+
+                    <div class="input-group">
+                        <textarea id="problem-input" rows="4" placeholder="e.g., I stayed up till 3 AM studying for data structures and ended up completely blanking on the first question..."></textarea>
+                    </div>
+
+                    <button class="btn-primary" onclick="generateWhatIfs()">
+                        <span>Generate What-If Scenarios</span>
+                        <span class="btn-arrow">→</span>
+                    </button>
+                </div>
+            </section>
+
+            <!-- STEP 2: Scenario Selection -->
+            <section id="step-2" class="step-section">
+                <div class="glass-panel main-card">
+                    <h2 class="section-title">Pick a Parallel Universe</h2>
+                    <p class="section-subtitle">Choose how you want to flip your situation into a magical reality.</p>
+                    
+                    <div class="problem-recap glass-panel-sm">
+                        <span class="recap-tag">Original Struggle:</span>
+                        <p id="recap-text"></p>
+                    </div>
+
+                    <div id="scenarios-grid" class="scenarios-grid">
+                        <!-- Dynamic scenario cards will be injected here -->
+                    </div>
+
+                    <div class="action-row">
+                        <button class="btn-secondary" onclick="goToStep(1)">← Back to Rant</button>
+                        <button id="btn-visualize" class="btn-primary" disabled onclick="visualizeSelectedScenario()">
+                            <span>Visualize This Universe</span>
+                            <span class="btn-arrow">→</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STEP 3: Art Card & Output -->
+            <section id="step-3" class="step-section">
+                <div class="glass-panel main-card">
+                    <h2 class="section-title">Your Parallel Reality</h2>
+                    <p class="section-subtitle">Here is your customized what-if reframe brought to life.</p>
+                    
+                    <div class="flip-card-container">
+                        <div id="flip-card" class="flip-card glass-panel-glow">
+                            <div class="card-image-wrapper">
+                                <img id="generated-image" src="" alt="What-If Illustration">
+                                <div class="image-overlay"></div>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-badge">LIFEFLIP MULTIVERSE</div>
+                                <h3 id="card-scenario-title" class="card-title"></h3>
+                                <div class="card-divider"></div>
+                                <div class="card-meta">
+                                    <span class="meta-label">Original Reality:</span>
+                                    <p id="card-original-text" class="meta-text"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="action-row">
+                        <button class="btn-secondary" onclick="goToStep(2)">← Change Scenario</button>
+                        <button class="btn-primary" onclick="publishToFeed()">
+                            <span>Share to Community Gallery</span>
+                            <span>✨</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay glass-panel">
+            <div class="spinner"></div>
+            <h3 id="loading-title" class="loading-title">Flipping Reality...</h3>
+            <p id="loading-desc" class="loading-desc">Consulting the multiverse algorithms...</p>
+        </div>
+
+        <!-- Community Feed Section -->
+        <section class="feed-section">
+            <div class="feed-header glass-panel">
+                <h2 class="feed-title">Multiverse Community Feed</h2>
+                <p class="feed-subtitle">See how other students are reframing their daily struggles.</p>
+            </div>
+            <div id="gallery-grid" class="gallery-grid">
+                <!-- Dynamic gallery cards will be injected here -->
+            </div>
+        </section>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
