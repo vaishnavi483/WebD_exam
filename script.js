@@ -5,6 +5,10 @@ let generatedScenarios = [];
 let selectedScenario = null;
 let currentImageDataUrl = "";
 
+// OPTIONAL: Add your Gemini API Key here if you want real AI image generation!
+// If left blank, it will seamlessly fall back to the dynamic neon canvas generator.
+const GEMINI_API_KEY = ""; 
+
 // Sample Feed Initial Data
 const sampleGallery = [
     {
@@ -32,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function goToStep(step) {
     currentStep = step;
 
-    // Update Step Indicators and Sections explicitly
     for (let i = 1; i <= 3; i++) {
         const navItem = document.getElementById(`step-nav-${i}`);
         const stepSection = document.getElementById(`step-${i}`);
@@ -145,49 +148,78 @@ function selectScenario(scenario, cardElement) {
     document.getElementById('btn-visualize').disabled = false;
 }
 
-// Visualize Selected Scenario
+// Visualize Selected Scenario (Gemini API Call + Fallback)
 async function visualizeSelectedScenario() {
     if (!selectedScenario) return;
 
-    showLoading("Generating Visual Reality...", "Painting your alternative universe in neon dark & light pink aesthetics...");
+    showLoading("Generating Visual Reality...", "Painting your alternative universe in dark & light pink aesthetics...");
 
-    setTimeout(() => {
-        currentImageDataUrl = createPlaceholderCanvasArt(selectedScenario.title);
+    let generatedImageUrl = null;
 
-        const imgElement = document.getElementById('generated-image');
-        imgElement.src = currentImageDataUrl;
-        
-        document.getElementById('card-scenario-title').innerText = selectedScenario.title;
-        document.getElementById('card-original-text').innerText = `"${userProblem}"`;
+    if (GEMINI_API_KEY) {
+        try {
+            const promptText = `A vibrant surreal digital art illustration matching the concept: ${selectedScenario.title}. Theme: dark background with glowing light pink aesthetic. High detail, cinematic lighting.`;
+            
+            const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generateImages:predict?key=${GEMINI_API_KEY}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    instances: [{ prompt: promptText }],
+                    parameters: { sampleCount: 1, aspectRatio: "1:1" }
+                })
+            });
 
-        hideLoading();
-        goToStep(3);
-    }, 1200);
+            const data = await response.json();
+            if (data.predictions && data.predictions[0] && data.predictions[0].bytesBase64Encoded) {
+                generatedImageUrl = `data:image/png;base64,${data.predictions[0].bytesBase64Encoded}`;
+            }
+        } catch (err) {
+            console.warn("API Call missed or unconfigured, using fallback canvas image generation.", err);
+        }
+    }
+
+    // Fallback: If no API key or API call failed, generate high quality visual canvas art
+    if (!generatedImageUrl) {
+        generatedImageUrl = createPlaceholderCanvasArt(selectedScenario.title);
+    }
+
+    currentImageDataUrl = generatedImageUrl;
+
+    const imgElement = document.getElementById('generated-image');
+    imgElement.src = currentImageDataUrl;
+    
+    document.getElementById('card-scenario-title').innerText = selectedScenario.title;
+    document.getElementById('card-original-text').innerText = `"${userProblem}"`;
+
+    hideLoading();
+    goToStep(3);
 }
 
-// Dynamic Canvas Fallback Image Generator
+// Dynamic Canvas Image Generator (Guarantees image output)
 function createPlaceholderCanvasArt(title) {
     const canvas = document.createElement('canvas');
     canvas.width = 600;
     canvas.height = 500;
     const ctx = canvas.getContext('2d');
 
-    // Dark Background Gradient
+    // Background Gradient
     const bgGrad = ctx.createLinearGradient(0, 0, 600, 500);
     bgGrad.addColorStop(0, '#0a0a0c');
-    bgGrad.addColorStop(1, '#231a26');
+    bgGrad.addColorStop(0.5, '#1e1322');
+    bgGrad.addColorStop(1, '#0a0a0c');
     ctx.fillStyle = bgGrad;
     ctx.fillRect(0, 0, 600, 500);
 
-    // Neon Pink Glowing Circles
-    for (let i = 0; i < 6; i++) {
+    // Glowing Pink Abstract Orbs & Rays
+    for (let i = 0; i < 8; i++) {
         const x = Math.random() * 600;
         const y = Math.random() * 500;
-        const radius = Math.random() * 120 + 30;
+        const radius = Math.random() * 140 + 40;
 
         const circleGrad = ctx.createRadialGradient(x, y, 0, x, y, radius);
-        circleGrad.addColorStop(0, 'rgba(255, 182, 193, 0.4)');
-        circleGrad.addColorStop(1, 'rgba(255, 182, 193, 0)');
+        circleGrad.addColorStop(0, 'rgba(255, 182, 193, 0.45)');
+        circleGrad.addColorStop(0.6, 'rgba(224, 147, 160, 0.15)');
+        circleGrad.addColorStop(1, 'rgba(10, 10, 12, 0)');
 
         ctx.fillStyle = circleGrad;
         ctx.beginPath();
@@ -195,15 +227,34 @@ function createPlaceholderCanvasArt(title) {
         ctx.fill();
     }
 
-    // Stylized Typography overlay
+    // Geometric Decorative Frame
+    ctx.strokeStyle = 'rgba(255, 182, 193, 0.3)';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(30, 30, 540, 440);
+
+    ctx.strokeStyle = 'rgba(255, 182, 193, 0.15)';
+    ctx.strokeRect(40, 40, 520, 420);
+
+    // Decorative Stars
+    for (let i = 0; i < 25; i++) {
+        const sx = Math.random() * 520 + 40;
+        const sy = Math.random() * 420 + 40;
+        ctx.fillStyle = '#ffd1dc';
+        ctx.fillRect(sx, sy, 2, 2);
+    }
+
+    // Center Title Text
     ctx.fillStyle = '#ffd1dc';
-    ctx.font = 'bold 22px "Vidaloka", serif';
+    ctx.font = 'bold 24px serif';
     ctx.textAlign = 'center';
+    ctx.shadowColor = 'rgba(255, 182, 193, 0.8)';
+    ctx.shadowBlur = 12;
     ctx.fillText(title, 300, 230);
 
+    ctx.shadowBlur = 0;
     ctx.fillStyle = 'rgba(255, 182, 193, 0.7)';
-    ctx.font = '13px "Space Mono", monospace';
-    ctx.fillText('LIFEFLIP PARALLEL UNIVERSE', 300, 270);
+    ctx.font = '12px monospace';
+    ctx.fillText('• PARALLEL UNIVERSE VISUALIZED •', 300, 270);
 
     return canvas.toDataURL('image/png');
 }
