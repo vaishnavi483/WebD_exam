@@ -32,17 +32,23 @@ document.addEventListener('DOMContentLoaded', () => {
 function goToStep(step) {
     currentStep = step;
 
-    // Update Step Indicators
+    // Update Step Indicators and Sections explicitly
     for (let i = 1; i <= 3; i++) {
         const navItem = document.getElementById(`step-nav-${i}`);
         const stepSection = document.getElementById(`step-${i}`);
 
         if (i === step) {
-            navItem.classList.add('active');
-            stepSection.classList.add('active');
+            if (navItem) navItem.classList.add('active');
+            if (stepSection) {
+                stepSection.classList.add('active');
+                stepSection.style.display = 'block';
+            }
         } else {
-            navItem.classList.remove('active');
-            stepSection.classList.remove('active');
+            if (navItem) navItem.classList.remove('active');
+            if (stepSection) {
+                stepSection.classList.remove('active');
+                stepSection.style.display = 'none';
+            }
         }
     }
     
@@ -65,7 +71,7 @@ function hideLoading() {
     document.getElementById('loading-overlay').classList.remove('active');
 }
 
-// Generate What-If Scenarios (Mock API / AI Integration logic)
+// Generate What-If Scenarios
 async function generateWhatIfs() {
     const inputVal = document.getElementById('problem-input').value.trim();
     if (!inputVal) {
@@ -76,7 +82,6 @@ async function generateWhatIfs() {
     userProblem = inputVal;
     showLoading("Consulting Multiverse...", "Crafting surreal what-if scenarios for your situation...");
 
-    // Simulate API delay / Processing response
     setTimeout(() => {
         generatedScenarios = [
             {
@@ -103,7 +108,7 @@ async function generateWhatIfs() {
         document.getElementById('recap-text').innerText = `"${userProblem}"`;
         hideLoading();
         goToStep(2);
-    }, 1200);
+    }, 1000);
 }
 
 // Render Scenario Cards
@@ -134,34 +139,33 @@ function renderScenarios() {
 function selectScenario(scenario, cardElement) {
     selectedScenario = scenario;
     
-    // Highlight UI
     document.querySelectorAll('.scenario-card').forEach(el => el.classList.remove('selected'));
     cardElement.classList.add('selected');
 
-    // Enable button
     document.getElementById('btn-visualize').disabled = false;
 }
 
-// Visualize Selected Scenario (Image Generation logic)
+// Visualize Selected Scenario
 async function visualizeSelectedScenario() {
     if (!selectedScenario) return;
 
     showLoading("Generating Visual Reality...", "Painting your alternative universe in neon dark & light pink aesthetics...");
 
-    // Generate Canvas Abstract Graphic as a placeholder visual
     setTimeout(() => {
         currentImageDataUrl = createPlaceholderCanvasArt(selectedScenario.title);
 
-        document.getElementById('generated-image').src = currentImageDataUrl;
+        const imgElement = document.getElementById('generated-image');
+        imgElement.src = currentImageDataUrl;
+        
         document.getElementById('card-scenario-title').innerText = selectedScenario.title;
         document.getElementById('card-original-text').innerText = `"${userProblem}"`;
 
         hideLoading();
         goToStep(3);
-    }, 1800);
+    }, 1200);
 }
 
-// Dynamic Canvas Fallback Image Generator (Uses theme pink & dark style)
+// Dynamic Canvas Fallback Image Generator
 function createPlaceholderCanvasArt(title) {
     const canvas = document.createElement('canvas');
     canvas.width = 600;
@@ -193,12 +197,12 @@ function createPlaceholderCanvasArt(title) {
 
     // Stylized Typography overlay
     ctx.fillStyle = '#ffd1dc';
-    ctx.font = 'bold 24px serif';
+    ctx.font = 'bold 22px "Vidaloka", serif';
     ctx.textAlign = 'center';
-    ctx.fillText(title, 300, 240);
+    ctx.fillText(title, 300, 230);
 
-    ctx.fillStyle = 'rgba(255, 182, 193, 0.6)';
-    ctx.font = '14px monospace';
+    ctx.fillStyle = 'rgba(255, 182, 193, 0.7)';
+    ctx.font = '13px "Space Mono", monospace';
     ctx.fillText('LIFEFLIP PARALLEL UNIVERSE', 300, 270);
 
     return canvas.toDataURL('image/png');
@@ -226,6 +230,7 @@ function publishToFeed() {
 // Render Gallery Cards
 function renderGallery() {
     const container = document.getElementById('gallery-grid');
+    if (!container) return;
     container.innerHTML = '';
 
     sampleGallery.forEach((item) => {
