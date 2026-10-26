@@ -289,7 +289,7 @@ function renderGallery() {
         card.className = 'gallery-card glass-panel';
 
         card.innerHTML = `
-            <img src="${item.imageUrl}" alt="${item.scenarioTitle}">
+            <img src="$https://www.istockphoto.com/photo/parallel-universe-science-theory-gm679649206-124512169}" alt="${item.scenarioTitle}">
             <div class="gallery-card-body">
                 <h4 class="gallery-card-title">${item.scenarioTitle}</h4>
                 <p class="gallery-card-text">"${item.problem}"</p>
